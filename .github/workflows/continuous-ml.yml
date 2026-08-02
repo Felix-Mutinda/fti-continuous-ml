@@ -1,0 +1,107 @@
+name: Continuous ML FTI Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  # Optional: Run nightly to check for natural drift
+  # schedule:
+  #   - cron: '0 0 * * *' 
+
+jobs:
+  fti-pipeline:
+    runs-on: ubuntu-latest
+    name: FTI Contract & Continuous Training
+    
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: fti_user
+          POSTGRES_PASSWORD: fti_password
+          POSTGRES_DB: fti_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Set up Python
+        run: uv python install 3.10
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Start MLflow Tracking Server
+        run: |
+          nohup uv run mlflow ui --host 127.0.0.1 --port 5000 > mlflow.log 2>&1 &
+          sleep 5 # Give the server a moment to boot
+
+      # ==========================================
+      # THE 'F' IN FTI: Feature Pipeline
+      # ==========================================
+      - name: 1. Data Ingestion & Feature Engineering (dbt)
+        run: |
+          uv run python data/ingest_data.py
+          uv run dbt run --project-dir dbt --profiles-dir dbt
+
+      - name: 2. Feature Store Materialization (Feast)
+        run: |
+          uv run python scripts/feast_materialize.py
+
+      # ==========================================
+      # THE 'T' IN FTI: Training & Registry
+      # ==========================================
+      - name: 3. Initial Model Training & Promotion (MLflow)
+        run: |
+          uv run python training/train_model.py
+          uv run python training/promote_model.py
+
+      # ==========================================
+      # THE PAYOFF: Automated Verification
+      # ==========================================
+      - name: 4. Run FTI Parity & Architecture Tests
+        run: |
+          uv run pytest tests/ -v
+
+      # ==========================================
+      # THE 'CONTINUOUS' PROOF: Drift & Retraining
+      # ==========================================
+      - name: 5. Simulate Drift & Verify Continuous Loop
+        run: |
+          echo "--- Injecting Concept Drift ---"
+          uv run python inference/simulate_drift.py
+          
+          echo "--- Verifying Drift Trigger ---"
+          # We expect this to fail (exit 1) because drift is detected
+          uv run python training/drift_detector.py && exit 1 || echo "✅ Drift correctly detected!"
+          
+          echo "--- Executing Continuous Retraining ---"
+          uv run python training/train_model.py
+          uv run python training/promote_model.py
+          
+          echo "--- Final Parity Check Post-Retrain ---"
+          uv run python scripts/verify_feast_parity.py
