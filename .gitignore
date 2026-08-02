@@ -1,0 +1,42 @@
+# --- Python & Virtual Environments ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+env/
+venv/
+
+# --- Data & Models ---
+data/raw/
+data/processed/
+models/
+*.pkl
+*.joblib
+
+# --- dbt ---
+dbt/logs/
+dbt/target/
+dbt/dbt_packages/
+dbt_packages/
+*.sql.bak
+
+# --- Feast ---
+feast/data/
+feast/registry.db
+feast/*.db
+
+# --- MLflow ---
+mlruns/
+mlartifacts/
+
+# --- IDE & OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Docker ---
+postgres_data/
+redis_data/
