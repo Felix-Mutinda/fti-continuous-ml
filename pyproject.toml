@@ -16,5 +16,11 @@ dependencies = [
     "redis>=7.4.1",
     "scikit-learn>=1.7.2",
     "scipy>=1.15.3",
+    "sqlalchemy>=2.0.51",
     "xgboost>=3.2.0",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.16.1",
 ]
