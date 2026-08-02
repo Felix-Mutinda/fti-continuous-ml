@@ -30,6 +30,7 @@ feast/feast/*.db
 # --- MLflow ---
 mlruns/
 mlartifacts/
+mlflow.db
 
 # --- IDE & OS ---
 .vscode/
