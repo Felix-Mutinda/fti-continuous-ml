@@ -1,0 +1,16 @@
+project: fti_project
+registry: registry.db
+provider: local
+offline_store:
+    type: postgres
+    host: localhost
+    port: 5432
+    database: fti_db
+    db_schema: public
+    user: fti_user
+    password: fti_password
+    sslmode: disable
+online_store:
+    type: redis
+    connection_string: "localhost:6379"
+entity_key_serialization_version: 3
