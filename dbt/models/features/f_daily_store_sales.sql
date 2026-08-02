@@ -1,3 +1,5 @@
+{{ config(materialized='table') }}
+
 SELECT
     store_id,
     date::timestamp AS event_timestamp, -- Feast requires a timestamp type

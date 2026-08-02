@@ -92,7 +92,10 @@ def load_to_postgres(df):
             time.sleep(2)
 
     print("Loading data into raw_sales table...")
-    # If table exists, replace it for a clean slate
+
+    # If table exists, drop/replace it for a clean slate
+    with engine.begin() as conn:
+        conn.execute(text("DROP TABLE IF EXISTS raw_sales CASCADE;"))
     df.to_sql("raw_sales", engine, if_exists="replace", index=False)
     print(f"Successfully loaded {len(df)} rows into Postgres.")
 
