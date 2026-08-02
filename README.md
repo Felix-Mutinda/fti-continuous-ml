@@ -1,8 +1,10 @@
-# FTI Continuous ML: The Decoupling Contract in OSS
+# Continuous ML: The FTI Decoupling Contract
 
 This repository implements the **Feature/Training/Inference (FTI)** decoupling contract, pioneered by Hopsworks and detailed in Jim Dowling’s O’Reilly book *[Building Machine Learning Systems with a Feature Store](https://www.hopsworks.ai/lp/full-book-oreilly-building-machine-learning-systems-with-a-feature-store)*, using entirely open-source tools.
 
-It proves that training-serving skew can be prevented *structurally* by enforcing that Feature, Training, and Inference pipelines communicate **only** through a centralized Feature Store. 
+It proves that training-serving skew can be prevented *structurally* by enforcing that Feature, Training, and Inference pipelines communicate **only** through a centralized Feature Store.
+
+![FTI Architecture](./fti_img.png)
 
 ## The Philosophy
 In the FTI paradigm, feature pipelines, training pipelines, and inference pipelines are three entirely independent artifacts. Training never touches raw data; inference never recomputes a feature from scratch. By building this contract from scratch using open-source tools, we prove the concept is tool-agnostic, deeply understood, and entirely portable.
