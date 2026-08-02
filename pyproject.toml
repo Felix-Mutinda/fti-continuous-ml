@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "dbt-postgres>=1.11.0",
-    "feast[redis]>=0.65.0",
+    "feast[postgres,redis]>=0.65.0",
     "mlflow>=3.15.0",
     "pandas>=2.3.3",
     "polars>=1.43.2",

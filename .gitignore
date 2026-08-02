@@ -25,6 +25,7 @@ dbt_packages/
 feast/data/
 feast/registry.db
 feast/*.db
+feast/feast/*.db
 
 # --- MLflow ---
 mlruns/
