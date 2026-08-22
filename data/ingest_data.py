@@ -1,4 +1,5 @@
 import time
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -104,6 +105,7 @@ if __name__ == "__main__":
     data = generate_retail_data()
 
     # Save locally as well for reference
+    Path("data/raw").mkdir(parents=True, exist_ok=True)
     data.to_csv("data/raw/retail_sales.csv", index=False)
     print("Saved raw data to data/raw/retail_sales.csv")
 
